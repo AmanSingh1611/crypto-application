@@ -11,7 +11,10 @@ import SwiftUI
 struct crypto_applicationApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                HomeView()
+                    .navigationBarBackButtonHidden()
+            }
         }
     }
 }
