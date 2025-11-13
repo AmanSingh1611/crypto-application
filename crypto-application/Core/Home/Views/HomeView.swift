@@ -77,6 +77,7 @@ extension HomeView{
                 CoinRowView(coin: coin, showHoldingsColumn: false)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
             }
+            .listRowBackground(Color.clear)
         }
         .listStyle(PlainListStyle())
     }
@@ -132,14 +133,14 @@ extension HomeView{
                     }
                 }
                 
-//                Button(action: {
-//                    withAnimation(.linear(duration: 2.0)) {
-//                        homeViewModel.reloadData()
-//                    }
-//                }, label: {
-//                    Image(systemName: "goforward")
-//                })
-//                .rotationEffect(Angle(degrees: homeViewModel.isLoading ? 360 : 0), anchor: .center)
+                Button(action: {
+                    withAnimation(.linear(duration: 2.0)) {
+                        homeViewModel.reloadData()
+                    }
+                }, label: {
+                    Image(systemName: "goforward")
+                })
+                .rotationEffect(Angle(degrees: homeViewModel.isLoading ? 360 : 0), anchor: .center)
             }
             .font(.caption)
             .foregroundColor(Color.theme.secondaryText)
