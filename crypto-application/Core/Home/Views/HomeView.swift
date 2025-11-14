@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var homeViewModel: HomeViewModel
     @State private var showPortfolio: Bool = false
+    @State private var showPortfolioView: Bool = false // new sheet
     
     var body: some View {
         ZStack {
@@ -39,6 +40,19 @@ struct HomeView: View {
             }
             
         }
+        .simultaneousGesture(
+        DragGesture(minimumDistance: 15)
+            .onEnded { value in
+                if abs(value.translation.height) > abs(value.translation.width) { return }
+                withAnimation(.spring()) {
+                    if value.translation.width < -80 {
+                        showPortfolio = true
+                    } else if value.translation.width > 80 {
+                        showPortfolio = false
+                    }
+                }
+            }
+        )
     }
 }
 extension HomeView{
@@ -50,7 +64,11 @@ extension HomeView{
                     .frame(width: 60, height: 60)
                 CircleButtonView(iconName: showPortfolio ? "plus" : "info")
                     .animation(.none, value: showPortfolio)
-                
+                    .onTapGesture {
+                        if showPortfolio {
+                            showPortfolioView.toggle()
+                        }
+                    }
             }
                 
             Spacer()
