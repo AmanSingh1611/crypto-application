@@ -26,3 +26,4 @@ struct XMarkButton_Previews: PreviewProvider {
         XMarkButton()
     }
 }
+

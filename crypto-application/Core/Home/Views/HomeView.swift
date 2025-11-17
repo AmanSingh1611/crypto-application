@@ -11,6 +11,9 @@ struct HomeView: View {
     @EnvironmentObject private var homeViewModel: HomeViewModel
     @State private var showPortfolio: Bool = false
     @State private var showPortfolioView: Bool = false // new sheet
+    @State private var showSettingsView: Bool = false // new sheet
+    @State private var selectedCoin: CoinModel? = nil
+    @State private var showDetailView: Bool = false
     
     var body: some View {
         ZStack {
@@ -42,20 +45,29 @@ struct HomeView: View {
                 Spacer(minLength: 0)
                 
             }
+            .sheet(isPresented: $showSettingsView, content: {
+                SettingsView()
+            })
             
         }
         .simultaneousGesture(
-        DragGesture(minimumDistance: 15)
-            .onEnded { value in
-                if abs(value.translation.height) > abs(value.translation.width) { return }
-                withAnimation(.spring()) {
-                    if value.translation.width < -80 {
-                        showPortfolio = true
-                    } else if value.translation.width > 80 {
-                        showPortfolio = false
+            DragGesture(minimumDistance: 15)
+                .onEnded { value in
+                    if abs(value.translation.height) > abs(value.translation.width) { return }
+                    withAnimation(.spring()) {
+                        if value.translation.width < -80 {
+                            showPortfolio = true
+                        } else if value.translation.width > 80 {
+                            showPortfolio = false
+                        }
                     }
                 }
-            }
+        )
+        .background(
+            NavigationLink(
+                destination: DetailLoadingView(coin: $selectedCoin),
+                isActive: $showDetailView,
+                label: { EmptyView() })
         )
     }
 }
@@ -71,6 +83,8 @@ extension HomeView{
                     .onTapGesture {
                         if showPortfolio {
                             showPortfolioView.toggle()
+                        } else {
+                            showSettingsView.toggle()
                         }
                     }
             }
@@ -99,6 +113,10 @@ extension HomeView{
             ForEach(homeViewModel.allCoins){ coin in
                 CoinRowView(coin: coin, showHoldingsColumn: false)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                    .onTapGesture {
+                        segue(coin: coin)
+                    }
+                    .listRowBackground(Color.theme.background)
             }
             .listRowBackground(Color.clear)
         }
@@ -110,9 +128,18 @@ extension HomeView{
             ForEach(homeViewModel.portfolioCoins){ coin in
                 CoinRowView(coin: coin, showHoldingsColumn: true)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                    .onTapGesture {
+                        segue(coin: coin)
+                    }
+                    .listRowBackground(Color.theme.background)
             }
         }
         .listStyle(PlainListStyle())
+    }
+    
+    private func segue(coin: CoinModel) {
+        selectedCoin = coin
+        showDetailView.toggle()
     }
     
     private var columnTitles: some View {
