@@ -162,7 +162,7 @@ extension PortfolioView {
             else { return }
         
         // save to portfolio
-        //homeViewModel.updatePortfolio(coin: coin, amount: amount)
+        homeViewModel.updatePortfolio(coin: coin, amount: amount)
         
         // show checkmark
         withAnimation(.easeIn) {

@@ -20,7 +20,7 @@ class HomeViewModel: ObservableObject {
         
     private let coinDataService = CoinDataService()
     private let marketDataService = MarketDataService()
-    //private let portfolioDataService = PortfolioDataService()
+    private let portfolioDataService = PortfolioDataService()
     private var cancellables = Set<AnyCancellable>()
     
     enum SortOption {
@@ -53,6 +53,15 @@ class HomeViewModel: ObservableObject {
             .sink { [weak self] (returnedStats) in
                 self?.statistics = returnedStats
                 self?.isLoading = false
+            }
+            .store(in: &cancellables)
+        
+        $allCoins
+            .combineLatest(portfolioDataService.$savedEntities)
+            .map(mapAllCoinsToPortfolioCoins)
+            .sink { [weak self] (returnedCoins) in
+                guard let self = self else { return }
+                self.portfolioCoins = self.sortPortfolioCoinsIfNeeded(coins: returnedCoins)
             }
             .store(in: &cancellables)
     }
@@ -138,5 +147,30 @@ class HomeViewModel: ObservableObject {
             portfolio
         ])
         return stats
+    }
+    
+    func updatePortfolio(coin: CoinModel, amount: Double) {
+        portfolioDataService.updatePortfolio(coin: coin, amount: amount)
+    }
+    
+    private func sortPortfolioCoinsIfNeeded(coins: [CoinModel]) -> [CoinModel] {
+            // will only sort by holdings or reversedholdings if needed
+        switch sortOption {
+        case .holdings:
+            return coins.sorted(by: { $0.currentHoldingsValue > $1.currentHoldingsValue })
+        case .holdingsReversed:
+            return coins.sorted(by: { $0.currentHoldingsValue < $1.currentHoldingsValue })
+        default:
+            return coins
+        }
+    }
+    private func mapAllCoinsToPortfolioCoins(allCoins: [CoinModel], portfolioEntities: [PortfolioEntity]) -> [CoinModel] {
+        allCoins
+            .compactMap { (coin) -> CoinModel? in
+                guard let entity = portfolioEntities.first(where: { $0.coinID == coin.id }) else {
+                    return nil
+                }
+                return coin.updateHoldings(amount: entity.amount)
+            }
     }
 }
