@@ -15,7 +15,7 @@ struct SettingsView: View {
     let githubURL = URL(string: "https://github.com/AmanSingh1611")!
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 // background
                 Color.theme.background
@@ -23,7 +23,7 @@ struct SettingsView: View {
                 
                 // content
                 List {
-                    swiftfulThinkingSection
+                    aboutSection
                         .listRowBackground(Color.theme.background.opacity(0.5))
                     coinGeckoSection
                         .listRowBackground(Color.theme.background.opacity(0.5))
@@ -54,7 +54,7 @@ struct SettingsView_Previews: PreviewProvider {
 
 extension SettingsView {
     
-    private var swiftfulThinkingSection: some View {
+    private var aboutSection: some View {
         Section(header: Text("About")) {
             VStack(alignment: .leading) {
                 Image("aman-image")

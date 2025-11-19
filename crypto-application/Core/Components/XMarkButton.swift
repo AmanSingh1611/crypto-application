@@ -9,7 +9,7 @@ import SwiftUI
 
 struct XMarkButton: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
         Button(action: {
